@@ -45,7 +45,7 @@ const MESSAGE_TYPES = {
  *
  * @author Leonardo Pereira da Silva
  */
-class Home extends Component {
+class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
@@ -108,7 +108,7 @@ class Home extends Component {
 
   /**
    * Atualiza o relogio exibido na tela.
-   * @memberof Home
+   * @memberof HomeScreen
    */
   refreshDateTime = () => {
     const { dateTime } = this.state;
