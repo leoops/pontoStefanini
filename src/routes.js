@@ -1,20 +1,17 @@
-import React from 'react';
-import { createStackNavigator } from 'react-navigation';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
+import HomeScreen from './views/HomeScreen';
 
-import Home from './views/Home';
-
-export default (Routes = () => {
-  NavigationContainer = createStackNavigator(
-    {
-      Home: {
-        screen: Home,
-      },
+const AppNavigator = createStackNavigator(
+  {
+    HomeScreen: {
+      screen: HomeScreen,
     },
-    {
-      navigationOptions: {
-        header: null,
-      },
-    }
-  );
-  return <NavigationContainer />;
-});
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+  }
+);
+
+export default createAppContainer(AppNavigator);
