@@ -6,8 +6,6 @@ import {
   CheckBox,
   Container,
   Content,
-  Footer,
-  FooterTab,
   Form,
   Icon,
   Input,
@@ -170,6 +168,31 @@ class HomeScreen extends Component {
     this.functions.map((func, index) => (
       <Picker.Item key={index} label={func.label} value={func.value} />
     ));
+
+  /**
+   * Cria componente de picker montado.
+   * @returns {Picker} - Retorn componente de Picker.
+   * @memberof Home
+   */
+  renderPicker = () => (
+    <Picker
+      mode="dialog"
+      iosIcon={
+        <View style={{ paddingRight: 10 }}>
+          <Icon name="ios-arrow-down" style={styles.iconPicker} />
+        </View>
+      }
+      placeholder="Selecione a Função"
+      placeholderIconColor={colors.WHITE}
+      placeholderStyle={{ color: colors.WHITE }}
+      style={styles.itemPicker}
+      textStyle={{ color: colors.WHITE }}
+      selectedValue={this.state.selectedFunction}
+      onValueChange={this.onFunctionSelected.bind(this)}
+    >
+      {this.renderPickerItems()}
+    </Picker>
+  );
 
   /**
    * Altera o estado do olho, exibindo a senha ou não.
@@ -380,51 +403,22 @@ class HomeScreen extends Component {
     const time = dateTime.format('HH:mm:ss');
     return (
       <View style={styles.dateTimeInfoContainer}>
-        <View style={styles.dateTimeInfoBox}>
-          <Text style={styles.dateTimeInfoTextStyle}>{clock.deviceTitle}</Text>
-          <Text style={styles.dateTimeInfoTextStyle}>{date}</Text>
-          <Text style={styles.dateTimeInfoTextStyle}>{time}</Text>
-        </View>
+        <Text style={styles.dateTimeInfoTextStyle}>Horário de Brasília</Text>
+        <Text style={styles.dateTimeInfoTextStyle}>
+          {date} - {time}
+        </Text>
       </View>
     );
   };
 
   render = () => {
-    const { dateTime } = this.state;
-    const date = dateTime.format('DD/MM/YYYY');
-    const time = dateTime.format('HH:mm:ss');
     return (
       <Container style={styles.container}>
-        <Content>
+        <Content showsVerticalScrollIndicator={false}>
+          {this.renderItemClock()}
           <Form>
-            <View style={styles.dateTimeInfoContainer}>
-              <View style={styles.dateTimeInfoBox}>
-                <Text style={styles.dateTimeInfoTextStyle}>
-                  Horário de Brasília
-                </Text>
-                <Text style={styles.dateTimeInfoTextStyle}>{date}</Text>
-                <Text style={styles.dateTimeInfoTextStyle}>{time}</Text>
-              </View>
-            </View>
             <Item regular picker style={styles.formItem}>
-              <Picker
-                mode="dialog"
-                iosIcon={
-                  <Icon
-                    name="ios-arrow-down-outline"
-                    style={styles.iconPicker}
-                  />
-                }
-                placeholder="Selecione a Função"
-                placeholderIconColor={colors.WHITE}
-                placeholderStyle={{ color: colors.WHITE }}
-                style={styles.itemPicker}
-                textStyle={{ color: colors.WHITE }}
-                selectedValue={this.state.selectedFunction}
-                onValueChange={this.onFunctionSelected.bind(this)}
-              >
-                {this.renderPickerItems()}
-              </Picker>
+              {this.renderPicker()}
             </Item>
             <Item regular style={styles.formItem}>
               <Input
@@ -455,7 +449,7 @@ class HomeScreen extends Component {
                 onPress={this.togglePasswordVisibility}
               />
             </Item>
-            <ListItem noBorder>
+            <ListItem noBorder onPress={this.toggleCheckSaveUserAndPass}>
               <CheckBox
                 checked={this.state.saveUserAndPass}
                 color={colors.BLUE}
@@ -491,35 +485,31 @@ class HomeScreen extends Component {
                 maxLength={4}
               />
             </Item>
-          </Form>
-        </Content>
-        <Footer>
-          <FooterTab>
             <Button
               full
               icon
               style={styles.button}
               onPress={this.onPressRegister}
             >
-              <Icon style={styles.iconButton} type="FontAwesome" name="check" />
               <Text style={styles.textButton}>REGISTRAR</Text>
             </Button>
-          </FooterTab>
-        </Footer>
+          </Form>
+        </Content>
       </Container>
     );
   };
 }
 
-export default Home;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    paddingHorizontal: 10,
     backgroundColor: colors.WHITE,
   },
   formItem: {
-    marginVertical: 10,
-    marginHolizontal: 15,
+    marginVertical: Platform.OS !== 'ios' ? 5 : 10,
     borderRadius: 5,
     borderColor: colors.BLUE,
     backgroundColor: colors.GRAY,
@@ -530,12 +520,8 @@ const styles = StyleSheet.create({
   dateTimeInfoContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 15,
-  },
-  dateTimeInfoBox: {
-    flex: 1,
-    alignItems: 'center',
-    width: 200,
+    alignSelf: 'center',
+    marginTop: 10,
   },
   dateTimeInfoTextStyle: {
     fontSize: 20,
@@ -546,7 +532,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 15,
+    marginTop: 5,
   },
   captchaImage: {
     width: 200,
@@ -556,7 +542,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: colors.BLUE,
   },
-  button: { backgroundColor: colors.BLUE },
+  button: {
+    flex: 1,
+    backgroundColor: colors.BLUE,
+    marginTop: 5,
+    marginBottom: Platform.OS !== 'ios' ? 10 : 0,
+    borderRadius: 5,
+  },
   textButton: {
     fontSize: 14,
     color: colors.WHITE,
@@ -564,6 +556,5 @@ const styles = StyleSheet.create({
   iconButton: { color: colors.WHITE },
   iconItem: { color: colors.WHITE },
   iconPicker: { color: colors.WHITE },
-  itemPicker:
-    Platform.OS !== 'ios' ? { color: colors.WHITE } : { width: '89%' },
+  itemPicker: Platform.OS !== 'ios' ? { color: colors.WHITE } : { flex: 1 },
 });
