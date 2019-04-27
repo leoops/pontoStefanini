@@ -26,6 +26,7 @@ import {
   GetClockDeviceInfo,
   MarkEletronicPoint,
 } from '../services/stefaniniAPI';
+import ItemContainer from '../components/ItemContainer';
 
 const ELETRONIC_POINT_KEY = '@ELETRONIC_POINT_STEFANINI:USER_PREFERENCES';
 const REGISTERED_POINT_KEY = '@REGISTERED_POINT:USER_PREFERENCES';
@@ -91,17 +92,21 @@ class HomeScreen extends Component {
     };
   }
 
+  componentDidMount = () => {
+    setInterval(this.refreshDateTime, 1000);
+  };
+
   componentWillMount = () => {
     this.initScreen();
   };
 
+  /**
+   * Métodos de iniciação da tela
+   * @memberof HomeScreen
+   */
   initScreen = () => {
     this.loadClock();
     this.loadUserPreferences();
-  };
-
-  componentDidMount = () => {
-    setInterval(this.refreshDateTime, 1000);
   };
 
   /**
@@ -364,8 +369,11 @@ class HomeScreen extends Component {
   /**
    * Exibe um alerta com as mensagens extraídas do endpoint.
    * @memberof Home
+   * @instance
+   * @param {string} message - Mensagem recebida
+   * @param {number} type - Tipo de mensagem a ser exibida
    */
-  showAlert = (msg, type) => {
+  showAlert = (message, type) => {
     let alertTitle;
     switch (type) {
       case MESSAGE_TYPES.tmOK:
@@ -381,12 +389,12 @@ class HomeScreen extends Component {
         alertTitle = 'Atenção';
         break;
     }
-    if (msg.includes('Usuário / Senha')) {
-      msg = 'Usuário e/ou Senha Inválidos!';
+    if (message.includes('Usuário / Senha')) {
+      message = 'Usuário e/ou Senha Inválidos!';
     }
     Alert.alert(
       alertTitle,
-      msg,
+      message,
       [
         {
           text: 'OK',
@@ -397,7 +405,11 @@ class HomeScreen extends Component {
     );
   };
 
-  renderItemClock = clock => {
+  /**
+   * Renderiza item de relógio.
+   * @memberof Home
+   */
+  renderItemClock = () => {
     const { dateTime } = this.state;
     const date = dateTime.format('DD/MM/YYYY');
     const time = dateTime.format('HH:mm:ss');
@@ -417,10 +429,8 @@ class HomeScreen extends Component {
         <Content showsVerticalScrollIndicator={false}>
           {this.renderItemClock()}
           <Form>
-            <Item regular picker style={styles.formItem}>
-              {this.renderPicker()}
-            </Item>
-            <Item regular style={styles.formItem}>
+            <ItemContainer picker>{this.renderPicker()}</ItemContainer>
+            <ItemContainer>
               <Input
                 style={styles.input}
                 placeholder="Usuário"
@@ -430,8 +440,8 @@ class HomeScreen extends Component {
                 value={this.state.username}
                 onChangeText={this.onUsernameChange.bind(this)}
               />
-            </Item>
-            <Item regular style={styles.formItem}>
+            </ItemContainer>
+            <ItemContainer>
               <Input
                 style={styles.input}
                 placeholder="Senha"
@@ -448,7 +458,7 @@ class HomeScreen extends Component {
                 style={styles.iconItem}
                 onPress={this.togglePasswordVisibility}
               />
-            </Item>
+            </ItemContainer>
             <ListItem noBorder onPress={this.toggleCheckSaveUserAndPass}>
               <CheckBox
                 checked={this.state.saveUserAndPass}
@@ -473,7 +483,7 @@ class HomeScreen extends Component {
                 onPress={this.reloadCaptcha}
               />
             </View>
-            <Item regular style={styles.formItem}>
+            <ItemContainer>
               <Input
                 style={styles.input}
                 placeholder="Captcha"
@@ -484,7 +494,7 @@ class HomeScreen extends Component {
                 onChangeText={this.onCaptchaChange.bind(this)}
                 maxLength={4}
               />
-            </Item>
+            </ItemContainer>
             <Button
               full
               icon
@@ -507,12 +517,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     backgroundColor: colors.WHITE,
-  },
-  formItem: {
-    marginVertical: Platform.OS !== 'ios' ? 5 : 10,
-    borderRadius: 5,
-    borderColor: colors.BLUE,
-    backgroundColor: colors.GRAY,
   },
   input: {
     color: colors.WHITE,
