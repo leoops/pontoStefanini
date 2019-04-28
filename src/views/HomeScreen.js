@@ -10,7 +10,6 @@ import {
   Icon,
   Input,
   ListItem,
-  Item,
   Picker,
   Text,
   View,
@@ -21,6 +20,8 @@ import dJSON from 'dirty-json';
 import moment from 'moment';
 
 import { colors } from '../utils/colors';
+import { noImage } from '../utils/images.json';
+
 import {
   GetCaptcha,
   GetClockDeviceInfo,
@@ -28,9 +29,8 @@ import {
 } from '../services/stefaniniAPI';
 import ItemContainer from '../components/ItemContainer';
 
-const ELETRONIC_POINT_KEY = '@ELETRONIC_POINT_STEFANINI:USER_PREFERENCES';
-const REGISTERED_POINT_KEY = '@REGISTERED_POINT:USER_PREFERENCES';
-const REGISTERED_POINT__DAY_KEY = '@REGISTERED_POINT_DAY:USER_PREFERENCES';
+const USER_PREFERENCES_KEY = '@ELETRONIC_POINT_STEFANINI:USER_PREFERENCES';
+const REGISTERED_POINT_KEY = '@ELETRONIC_POINT_STEFANINI:REGISTERED_POINT';
 
 const MESSAGE_TYPES = {
   tmNormal: 0,
@@ -81,8 +81,7 @@ class HomeScreen extends Component {
       password: '',
       saveUserAndPass: false,
       captcha: '',
-      captchaSource:
-        'data:image/png;base64,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',
+      captchaSource: noImage,
       crachaCt: '',
       userNameCt: '',
       passwordCt: '',
@@ -93,11 +92,8 @@ class HomeScreen extends Component {
   }
 
   componentDidMount = () => {
-    setInterval(this.refreshDateTime, 1000);
-  };
-
-  componentWillMount = () => {
     this.initScreen();
+    setInterval(this.refreshDateTime, 1000);
   };
 
   /**
@@ -175,8 +171,8 @@ class HomeScreen extends Component {
     ));
 
   /**
-   * Cria componente de picker montado.
-   * @returns {Picker} - Retorn componente de Picker.
+   * Metodo de criação de componet de picker.
+   * @returns {Picker} - Componente de Picker.
    * @memberof Home
    */
   renderPicker = () => (
@@ -212,7 +208,10 @@ class HomeScreen extends Component {
    * @memberof Home
    */
   toggleCheckSaveUserAndPass = () => {
-    this.setState({ saveUserAndPass: !this.state.saveUserAndPass });
+    this.setState(
+      { saveUserAndPass: !this.state.saveUserAndPass },
+      this.saveUserPreferences
+    );
   };
 
   /**
@@ -221,7 +220,7 @@ class HomeScreen extends Component {
    */
   loadUserPreferences = async () => {
     try {
-      let USER_PREFERENCES = await AsyncStorage.getItem(ELETRONIC_POINT_KEY);
+      let USER_PREFERENCES = await AsyncStorage.getItem(USER_PREFERENCES_KEY);
       if (USER_PREFERENCES) {
         const { username, password, saveUserAndPass } = JSON.parse(
           USER_PREFERENCES
@@ -243,12 +242,20 @@ class HomeScreen extends Component {
   saveUserPreferences = async () => {
     try {
       const { username, password, saveUserAndPass } = this.state;
-      const USER_PREFERENCES = {
-        username,
-        password,
-        saveUserAndPass,
-      };
-      await AsyncStorage.setItem(STORE_KEY, JSON.stringify(USER_PREFERENCES));
+
+      if (saveUserAndPass) {
+        const USER_PREFERENCES = {
+          username,
+          password,
+          saveUserAndPass,
+        };
+        await AsyncStorage.setItem(
+          USER_PREFERENCES_KEY,
+          JSON.stringify(USER_PREFERENCES)
+        );
+      } else {
+        this.resetUserPreferences();
+      }
     } catch (error) {}
   };
 
@@ -259,7 +266,7 @@ class HomeScreen extends Component {
    */
   resetUserPreferences = async () => {
     try {
-      await AsyncStorage.removeItem(STORE_KEY);
+      await AsyncStorage.removeItem(USER_PREFERENCES_KEY);
     } catch (error) {}
   };
 
@@ -342,11 +349,11 @@ class HomeScreen extends Component {
       saveUserAndPass,
       captcha,
     } = this.state;
+
     if (saveUserAndPass) {
       this.saveUserPreferences();
-    } else {
-      this.resetUserPreferences();
     }
+
     MarkEletronicPoint(deviceID, selectedFunction, username, password, captcha)
       .then(response => response.data)
       .then(response => {
@@ -473,6 +480,7 @@ class HomeScreen extends Component {
               <Thumbnail
                 style={styles.captchaImage}
                 square
+                resizeMode="contain"
                 large
                 source={{ uri: this.state.captchaSource }}
               />
